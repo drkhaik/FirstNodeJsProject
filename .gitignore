@@ -1,0 +1,6 @@
+/node_modules
+/vendor
+/.idea
+.idea/
+.env
+#  nhung file ko dc tai len github ~ git ignore
