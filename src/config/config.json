@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": null,
-    "database": "First_NodeJS_project",
+    "database": "BookingCare",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
