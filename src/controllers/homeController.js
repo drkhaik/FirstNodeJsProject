@@ -17,9 +17,11 @@ let createUserGet = (req, res) => {
 }
 
 let createUserPost = async (req, res) => {
-    let message = await CRUDservice.createNewUser(req.body);
-    console.log(message)
-    return res.send("Post CRUD from server");
+    let allUsers = await CRUDservice.createNewUser(req.body);
+
+    return res.render("DisplayUser.ejs", {
+        data: allUsers
+    });
 }
 
 let getUser = async (req, res) => {
@@ -29,9 +31,47 @@ let getUser = async (req, res) => {
     });
 }
 
+let editUser = async (req, res) => {
+    console.log(req.query.id);
+    let userId = req.query.id;
+    if (userId) {
+        let userInfo = await CRUDservice.getUserInfoById(userId);
+        return res.render("EditUser.ejs", {
+            userInfo: userInfo
+        })
+    } else {
+        return res.send("Users not found!")
+
+    }
+}
+
+let updateUser = async (req, res) => {
+    let newUserInfo = req.body;
+    // let userId = req.body.id;
+    let allUsers = await CRUDservice.updateUserInfo(newUserInfo);
+    return res.render("DisplayUser.ejs", {
+        data: allUsers
+    });
+}
+
+let deleteUser = async (req, res) => {
+    let userId = req.query.id;
+    if (userId) {
+        let allUsers = await CRUDservice.deleteUserById(userId);
+        return res.render("DisplayUser.ejs", {
+            data: allUsers
+        });
+    } else {
+        return res.send("User not found!")
+    }
+}
+
 module.exports = {
     getHomePage: getHomePage,
     createUserGet: createUserGet,
     createUserPost: createUserPost,
     getUser: getUser,
+    editUser: editUser,
+    updateUser: updateUser,
+    deleteUser: deleteUser,
 }
