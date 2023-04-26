@@ -13,7 +13,13 @@ let initWebRoutes = (app) => {
     router.post('/updateUser', homeController.updateUser);
     router.get('/deleteUser', homeController.deleteUser);
 
+    // ----------- USER ------------ //
     router.post('/api/login', userController.handleLogin);
+    router.get('/api/getUsers', userController.handleGetUsers);
+    router.post('/api/createUser', userController.handleCreateUser);
+    router.put('/api/editUser', userController.handleEditUser);
+    router.delete('/api/deleteUser', userController.handleDeleteUser);
+
     // router.get('/hoidanIT', (req, res) => {
     //     return res.send("Hoi dan IT tai day");
     // });
