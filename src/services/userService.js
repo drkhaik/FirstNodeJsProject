@@ -12,7 +12,7 @@ let handleUserLogin = (email, password) => {
                 // user already exist
                 let user = await db.User.findOne({
                     where: { email: email },
-                    attributes: ['email', 'roleId', 'password'],
+                    attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'],
                     raw: true,
                 })
                 if (user) {
@@ -96,28 +96,30 @@ let createUser = (data) => {
                     errCode: 1,
                     message: "Your email is already in use! Try another please!",
                 })
-            }
-            let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-            await db.User.create({
-                email: data.email,
-                password: hashPasswordFromBcrypt,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                address: data.address,
-                phoneNumber: data.phoneNumber,
-                gender: data.gender,
-                // image: null,
-                roleId: data.role,
-                // positionId: null,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            })
-            // let allUsers = getUsers();
+            } else {
+                let hashPasswordFromBcrypt = await hashUserPassword(data.password);
+                await db.User.create({
+                    email: data.email,
+                    password: hashPasswordFromBcrypt,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    address: data.address,
+                    phoneNumber: data.phoneNumber,
+                    gender: data.gender,
+                    roleId: data.roleId,
+                    positionId: data.positionId,
+                    image: data.image,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                })
+                // let allUsers = getUsers();
 
-            resolve({
-                errCode: 0,
-                message: "OK",
-            })
+                resolve({
+                    errCode: 0,
+                    message: "OK",
+                })
+            }
+
 
         } catch (e) {
             reject((e))
@@ -139,7 +141,7 @@ let hashUserPassword = (password) => {
 let updateUser = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.id) {
+            if (!data.id || !data.roleId || !data.gender || !data.positionId) {
                 resolve({
                     errCode: 2,
                     message: 'Missing required parameters!'
@@ -155,6 +157,12 @@ let updateUser = (data) => {
                 user.lastName = data.lastName;
                 user.address = data.address;
                 user.phoneNumber = data.phoneNumber;
+                user.gender = data.gender;
+                user.roleId = data.roleId;
+                user.positionId = data.positionId;
+                if (data.image) {
+                    user.image = data.image;
+                }
                 await user.save();
                 // let allUsers = getAllUser();
 
@@ -199,6 +207,28 @@ let deleteUser = (userId) => {
     })
 }
 
+let getAllCodeService = (typeInput) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!typeInput) {
+                resolve({
+                    errCode: 1,
+                    message: `Missing required parameters!`
+                })
+            } else {
+                let res = {};
+                let allcode = await db.Allcode.findAll({
+                    where: { type: typeInput }
+                });
+                res.errCode = 0
+                res.data = allcode
+                resolve(res)
+            }
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 
 
 module.exports = {
@@ -207,4 +237,5 @@ module.exports = {
     createUser: createUser,
     updateUser: updateUser,
     deleteUser: deleteUser,
+    getAllCodeService: getAllCodeService,
 }

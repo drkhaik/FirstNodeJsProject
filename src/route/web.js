@@ -20,6 +20,8 @@ let initWebRoutes = (app) => {
     router.put('/api/editUser', userController.handleEditUser);
     router.delete('/api/deleteUser', userController.handleDeleteUser);
 
+    router.get('/api/allcode', userController.getAllCode);
+
     // router.get('/hoidanIT', (req, res) => {
     //     return res.send("Hoi dan IT tai day");
     // });
