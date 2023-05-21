@@ -27,6 +27,9 @@ let initWebRoutes = (app) => {
     router.get('/api/getOutstandingDoctor', doctorController.getOutstandingDoctor);
     router.get('/api/getAllDoctor', doctorController.getAllDoctor);
     router.post('/api/saveInfoDoctor', doctorController.saveInfoDoctor);
+    router.get('/api/get-detail-doctor-by-id', doctorController.getDetailDoctorById);
+    router.get('/api/get-detail-section-doctor', doctorController.getDetailSectionDoctor);
+    router.post('/api/save-schedule-info', doctorController.saveScheduleInfo);
 
     // router.get('/hoidanIT', (req, res) => {
     //     return res.send("Hoi dan IT tai day");

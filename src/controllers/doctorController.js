@@ -41,8 +41,51 @@ let saveInfoDoctor = async (req, res) => {
         })
     }
 }
+
+let getDetailDoctorById = async (req, res) => {
+    try {
+        let detailInfo = await doctorService.getDetailDoctorByIdService(req.query.id);
+        return res.status(200).json(detailInfo);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
+
+let getDetailSectionDoctor = async (req, res) => {
+    try {
+        let detailSection = await doctorService.getDetailSectionDoctorService(req.query.id);
+        return res.status(200).json(detailSection);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
+
+let saveScheduleInfo = async (req, res) => {
+    try {
+        let response = await doctorService.saveScheduleInfoService(req.body);
+        return res.status(200).json(response);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
+
 module.exports = {
     getOutstandingDoctor: getOutstandingDoctor,
     getAllDoctor: getAllDoctor,
-    saveInfoDoctor: saveInfoDoctor
+    saveInfoDoctor: saveInfoDoctor,
+    getDetailDoctorById: getDetailDoctorById,
+    getDetailSectionDoctor: getDetailSectionDoctor,
+    saveScheduleInfo: saveScheduleInfo,
 }
