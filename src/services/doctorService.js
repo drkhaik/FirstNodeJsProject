@@ -180,18 +180,21 @@ let saveScheduleInfoService = (scheduleInfo) => {
                     raw: true,
                 })
                 // convert Date from DB to compare
-                if (existingDataInDB && existingDataInDB.length > 0) {
-                    existingDataInDB = existingDataInDB.map(item => {
-                        item.date = new Date(item.date).setHours(0, 0, 0, 0);
-                        return item;
-                    })
-                }
+                // if (existingDataInDB && existingDataInDB.length > 0) {
+                //     existingDataInDB = existingDataInDB.map(item => {
+                //         item.date = new Date(item.date).setHours(0, 0, 0, 0);
+                //         return item;
+                //     })
+                // }
+                console.log("check in DB", existingDataInDB)
+                console.log("check create", schedule)
                 // compare two array
                 let arrAfterCompare = _.differenceWith(schedule, existingDataInDB, (a, b) => {
-                    return a.timeType === b.timeType && a.date === b.date
+                    // them dau cong truoc chuoi de bien chuoi thanh so vd: a = '5', b = +a (b=5) 
+                    return a.timeType === b.timeType && +a.date === +b.date
                 })
 
-                console.log('check compare: ', arrAfterCompare)
+                // console.log('check compare: ', arrAfterCompare)
                 if (arrAfterCompare && arrAfterCompare.length > 0) {
                     await db.Schedule.bulkCreate(arrAfterCompare)
                 }
@@ -209,6 +212,38 @@ let saveScheduleInfoService = (scheduleInfo) => {
 
 }
 
+let getScheduleInfoByDateService = (doctorId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // errorBoundary
+            if (!doctorId || !date) {
+                resolve({
+                    errCode: 1,
+                    message: 'Missing required parameters!'
+                })
+            } else {
+                let data = await db.Schedule.findAll({
+                    where: { doctorId: doctorId, date: date },
+                    include: [
+                        { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] },
+                    ],
+                    raw: true,
+                    nest: true,
+                })
+
+                if (!data) data = [];
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     getOutstandingDoctor: getOutstandingDoctor,
     getAllDoctorService: getAllDoctorService,
@@ -216,4 +251,5 @@ module.exports = {
     getDetailDoctorByIdService: getDetailDoctorByIdService,
     getDetailSectionDoctorService: getDetailSectionDoctorService,
     saveScheduleInfoService: saveScheduleInfoService,
+    getScheduleInfoByDateService: getScheduleInfoByDateService,
 }

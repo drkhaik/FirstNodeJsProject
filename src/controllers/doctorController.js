@@ -2,7 +2,7 @@ import doctorService from "../services/doctorService";
 
 let getOutstandingDoctor = async (req, res) => {
     let limit = req.query.limit;
-    if (!limit) limit = 10;
+    if (!limit) limit = 11;
     try {
         // chuyen tu kieu string sang number
         let response = await doctorService.getOutstandingDoctor(+limit);
@@ -81,6 +81,19 @@ let saveScheduleInfo = async (req, res) => {
     }
 }
 
+let getScheduleInfoByDate = async (req, res) => {
+    try {
+        let detailSchedule = await doctorService.getScheduleInfoByDateService(req.query.doctorId, req.query.date);
+        return res.status(200).json(detailSchedule);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
+
 module.exports = {
     getOutstandingDoctor: getOutstandingDoctor,
     getAllDoctor: getAllDoctor,
@@ -88,4 +101,5 @@ module.exports = {
     getDetailDoctorById: getDetailDoctorById,
     getDetailSectionDoctor: getDetailSectionDoctor,
     saveScheduleInfo: saveScheduleInfo,
+    getScheduleInfoByDate: getScheduleInfoByDate,
 }
