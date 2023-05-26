@@ -50,12 +50,32 @@ let getAllDoctorService = () => {
 let saveInfoDoctorService = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!data.doctorId || !data.contentHTML || !data.contentMarkdown || !data.actions) {
+            // data = JSON.stringify([data]);
+            // data = JSON.parse(data);
+            // data[key] = data;
+            // console.log("data from server", data)
+            // data.map((item) => {
+            //     console.log("check item", item)
+            //     if (_.isEmpty(item)) {
+            //         resolve({
+            //             errCode: 1,
+            //             message: 'Missing required parameters!'
+            //         })
+            //         return;
+            //     }
+            // });
+            // console.log("from sever, test Ok")
+
+            if (!data.doctorId || !data.contentHTML || !data.contentMarkdown || !data.actions || !data.description
+                || !data.selectedPrice || !data.selectedPayment || !data.selectedProvince || !data.nameClinic
+                || !data.addressClinic || !data.note) {
                 resolve({
                     errCode: 1,
                     message: 'Missing required parameters!'
                 })
-            } else {
+            }
+            else {
+                // insert or update Detail Section
                 if (data.actions === 'CREATE') {
                     await db.Detail_Section.create({
                         contentHTML: data.contentHTML,
@@ -75,6 +95,36 @@ let saveInfoDoctorService = (data) => {
                         doctor.updateAt = new Date();
                         await doctor.save();
                     }
+                }
+
+                // insert or update Detail Info of Doctor
+                let doctorInfo = await db.Doctor_Info.findOne({
+                    where: {
+                        doctorId: data.doctorId,
+                    },
+                    raw: false
+                })
+                if (doctorInfo) {
+                    // update
+                    doctorInfo.priceId = data.selectedPrice;
+                    doctorInfo.paymentId = data.selectedPayment;
+                    doctorInfo.provinceId = data.selectedProvince;
+                    doctorInfo.nameClinic = data.nameClinic;
+                    doctorInfo.addressClinic = data.addressClinic;
+                    doctorInfo.note = data.note;
+                    doctorInfo.updateAt = new Date();
+                    await doctorInfo.save();
+                } else {
+                    // create
+                    await db.Doctor_Info.create({
+                        doctorId: data.doctorId,
+                        priceId: data.selectedPrice,
+                        paymentId: data.selectedPayment,
+                        provinceId: data.selectedProvince,
+                        nameClinic: data.nameClinic,
+                        addressClinic: data.addressClinic,
+                        note: data.note,
+                    })
                 }
             }
             resolve({
@@ -104,6 +154,17 @@ let getDetailDoctorByIdService = (id) => {
                         { model: db.Detail_Section, attributes: ['contentHTML', 'contentMarkdown', 'description'] },
                         // { model: db.Detail_Section },
                         { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                        {
+                            model: db.Doctor_Info,
+                            attributes: {
+                                exclude: ['id', 'doctorId'],
+                            },
+                            include: [
+                                { model: db.Allcode, as: 'priceData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'provinceData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'paymentData', attributes: ['valueEn', 'valueVi'] },
+                            ]
+                        }
                     ],
                     raw: false,
                     nest: true,
@@ -244,6 +305,41 @@ let getScheduleInfoByDateService = (doctorId, date) => {
     })
 }
 
+let getExtraInfoDoctorByIdService = (doctorId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // errorBoundary
+            if (!doctorId) {
+                resolve({
+                    errCode: 1,
+                    message: 'Missing required parameters!'
+                })
+            } else {
+                let data = await db.Doctor_Info.findOne({
+                    where: { doctorId: doctorId },
+                    attributes: { exclude: ["id", "doctorId"] },
+                    include: [
+                        { model: db.Allcode, as: 'priceData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'provinceData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'paymentData', attributes: ['valueEn', 'valueVi'] },
+                    ],
+                    raw: true,
+                    nest: true,
+                })
+
+                if (!data) data = [];
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     getOutstandingDoctor: getOutstandingDoctor,
     getAllDoctorService: getAllDoctorService,
@@ -252,4 +348,5 @@ module.exports = {
     getDetailSectionDoctorService: getDetailSectionDoctorService,
     saveScheduleInfoService: saveScheduleInfoService,
     getScheduleInfoByDateService: getScheduleInfoByDateService,
+    getExtraInfoDoctorByIdService: getExtraInfoDoctorByIdService,
 }

@@ -31,6 +31,9 @@ let initWebRoutes = (app) => {
     router.get('/api/get-detail-section-doctor', doctorController.getDetailSectionDoctor);
     router.post('/api/save-schedule-info', doctorController.saveScheduleInfo);
     router.get('/api/get-schedule-info-by-date', doctorController.getScheduleInfoByDate);
+    router.get('/api/get-extra-info-doctor-by-id', doctorController.getExtraInfoDoctorById);
+
+
 
     // router.get('/hoidanIT', (req, res) => {
     //     return res.send("Hoi dan IT tai day");
