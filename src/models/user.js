@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsTo(models.Allcode, { foreignKey: 'positionId', targetKey: 'keyMap', as: 'positionData' })
       User.hasOne(models.Detail_Section, { foreignKey: 'doctorId' })
       User.hasOne(models.Doctor_Info, { foreignKey: 'doctorId' })
-
+      User.hasMany(models.Schedule, { foreignKey: 'doctorId', as: "doctorData" }) // 1 n
     }
   };
   User.init({
@@ -30,6 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     image: DataTypes.STRING,
     roleId: DataTypes.STRING,
     positionId: DataTypes.STRING,
+    day_of_birth: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

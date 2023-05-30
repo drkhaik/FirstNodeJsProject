@@ -52,11 +52,12 @@ let saveInfoDoctorService = (data) => {
         try {
             // data = JSON.stringify([data]);
             // data = JSON.parse(data);
-            // data[key] = data;
+            console.log("check data 10:40", data)
             // console.log("data from server", data)
             // data.map((item) => {
             //     console.log("check item", item)
-            //     if (_.isEmpty(item)) {
+            // if(data.item === "" || data.item === null)
+            //     if (item === '' || item === null) {
             //         resolve({
             //             errCode: 1,
             //             message: 'Missing required parameters!'
@@ -66,6 +67,30 @@ let saveInfoDoctorService = (data) => {
             // });
             // console.log("from sever, test Ok")
 
+            // let schedule = scheduleInfo.arrSchedule;
+            // if (schedule && schedule.length > 0) {
+            //     schedule = schedule.map(item => {
+            //         item.maxNumber = MAX_NUMBER_SCHEDULE;
+            //         return item;
+            //     })
+            // }
+            // for(let i = 0; i < 11; i ++){
+            //     if(data.length)
+            // }
+            // if (data && data.length > 0) {
+            //     data = data.map(item => {
+            //         return console.log("console log item", data.item);
+
+            //     })
+            // }    
+            // console.log("so luong phan tu", Object.keys(data).length)
+            // if (Object.keys(data).length < 11) {
+            //     resolve({
+            //         errCode: 1,
+            //         message: 'Missing required parameters!'
+            //     })
+            // }
+            // return true;
             if (!data.doctorId || !data.contentHTML || !data.contentMarkdown || !data.actions || !data.description
                 || !data.selectedPrice || !data.selectedPayment || !data.selectedProvince || !data.nameClinic
                 || !data.addressClinic || !data.note) {
@@ -287,6 +312,8 @@ let getScheduleInfoByDateService = (doctorId, date) => {
                     where: { doctorId: doctorId, date: date },
                     include: [
                         { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.User, as: 'doctorData', attributes: ['firstName', 'lastName'] },
+
                     ],
                     raw: true,
                     nest: true,
@@ -340,6 +367,55 @@ let getExtraInfoDoctorByIdService = (doctorId) => {
     })
 }
 
+let getProfileDoctorByIdService = (doctorId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // errorBoundary
+            if (!doctorId) {
+                resolve({
+                    errCode: 1,
+                    message: 'Missing required parameters!'
+                })
+            } else {
+                let data = await db.User.findOne({
+                    where: { id: doctorId },
+                    attributes: { exclude: ["password", 'createdAt', 'updatedAt', 'phoneNumber', 'gender', 'address'] },
+                    include: [
+                        { model: db.Detail_Section, attributes: ['description'] },
+                        // { model: db.Detail_Section },
+                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                        {
+                            model: db.Doctor_Info,
+                            attributes: {
+                                exclude: ['id', 'doctorId', 'createdAt', 'updatedAt', 'count'],
+                            },
+                            include: [
+                                { model: db.Allcode, as: 'priceData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'provinceData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'paymentData', attributes: ['valueEn', 'valueVi'] },
+                            ]
+                        }
+                    ],
+                    raw: false,
+                    nest: true,
+                })
+
+                if (data && data.image) {
+                    data.image = new Buffer(data.image, 'base64').toString('binary');
+                }
+                if (!data) data = {};
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
+
 module.exports = {
     getOutstandingDoctor: getOutstandingDoctor,
     getAllDoctorService: getAllDoctorService,
@@ -349,4 +425,6 @@ module.exports = {
     saveScheduleInfoService: saveScheduleInfoService,
     getScheduleInfoByDateService: getScheduleInfoByDateService,
     getExtraInfoDoctorByIdService: getExtraInfoDoctorByIdService,
+
+    getProfileDoctorByIdService: getProfileDoctorByIdService,
 }

@@ -6,7 +6,7 @@ let getOutstandingDoctor = async (req, res) => {
     try {
         // chuyen tu kieu string sang number
         let response = await doctorService.getOutstandingDoctor(+limit);
-        console.log('check response doctor Controller: ', response);
+        // console.log('check response doctor Controller: ', response);
         return res.status(200).json(response)
     } catch (e) {
         console.log(e);
@@ -107,6 +107,19 @@ let getExtraInfoDoctorById = async (req, res) => {
     }
 }
 
+let getProfileDoctorById = async (req, res) => {
+    try {
+        let extraInfoDoctor = await doctorService.getProfileDoctorByIdService(req.query.doctorId);
+        return res.status(200).json(extraInfoDoctor);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
+
 module.exports = {
     getOutstandingDoctor: getOutstandingDoctor,
     getAllDoctor: getAllDoctor,
@@ -116,4 +129,6 @@ module.exports = {
     saveScheduleInfo: saveScheduleInfo,
     getScheduleInfoByDate: getScheduleInfoByDate,
     getExtraInfoDoctorById: getExtraInfoDoctorById,
+
+    getProfileDoctorById: getProfileDoctorById
 }
