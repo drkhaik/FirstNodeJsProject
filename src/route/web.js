@@ -3,6 +3,7 @@ import homeController from "../controllers/homeController";
 import userController from "../controllers/userController";
 import doctorController from "../controllers/doctorController";
 import patientController from "../controllers/patientController";
+import specialtyController from "../controllers/specialtyController";
 
 let router = Express.Router();
 
@@ -38,6 +39,16 @@ let initWebRoutes = (app) => {
     // ----------- PATIENT ------------ //
     router.post('/api/patient-book-an-appointment', patientController.bookAnAppointment);
     router.post('/api/verify-an-appointment', patientController.verifyAnAppointment);
+
+    // ----------- SPECIALTY ------------ //
+    router.post('/api/create-new-specialty', specialtyController.createNewSpecialty);
+    router.get('/api/get-all-specialty', specialtyController.getAllSpecialty);
+    router.get('/api/get-detail-specialty-by-id', specialtyController.getDetailSpecialtyById);
+    router.get('/api/delete-specialty-by-id', specialtyController.deleteSpecialtyById);
+
+
+
+
     // router.get('/hoidanIT', (req, res) => {
     //     return res.send("Hoi dan IT tai day");
     // });

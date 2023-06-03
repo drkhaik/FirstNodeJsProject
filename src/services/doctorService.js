@@ -44,59 +44,30 @@ let getAllDoctorService = () => {
             reject(e)
         }
     })
+}
 
+let checkRequiredFields = (data) => {
+    let arrField = ['doctorId', 'contentHTML', 'contentMarkdown', 'actions', 'description', 'selectedPrice', 'selectedPayment',
+        'selectedProvince', 'nameClinic', 'addressClinic', 'note', 'specialtyId'];
+    let isValid = true, element = '';
+    for (let i = 0; i < arrField.length; i++) {
+        if (!data[arrField[i]]) {
+            isValid = false;
+            element = arrField[i];
+            break;
+        }
+    }
+    return { isValid: isValid, element: element }
 }
 
 let saveInfoDoctorService = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            // data = JSON.stringify([data]);
-            // data = JSON.parse(data);
-            console.log("check data 10:40", data)
-            // console.log("data from server", data)
-            // data.map((item) => {
-            //     console.log("check item", item)
-            // if(data.item === "" || data.item === null)
-            //     if (item === '' || item === null) {
-            //         resolve({
-            //             errCode: 1,
-            //             message: 'Missing required parameters!'
-            //         })
-            //         return;
-            //     }
-            // });
-            // console.log("from sever, test Ok")
-
-            // let schedule = scheduleInfo.arrSchedule;
-            // if (schedule && schedule.length > 0) {
-            //     schedule = schedule.map(item => {
-            //         item.maxNumber = MAX_NUMBER_SCHEDULE;
-            //         return item;
-            //     })
-            // }
-            // for(let i = 0; i < 11; i ++){
-            //     if(data.length)
-            // }
-            // if (data && data.length > 0) {
-            //     data = data.map(item => {
-            //         return console.log("console log item", data.item);
-
-            //     })
-            // }    
-            // console.log("so luong phan tu", Object.keys(data).length)
-            // if (Object.keys(data).length < 11) {
-            //     resolve({
-            //         errCode: 1,
-            //         message: 'Missing required parameters!'
-            //     })
-            // }
-            // return true;
-            if (!data.doctorId || !data.contentHTML || !data.contentMarkdown || !data.actions || !data.description
-                || !data.selectedPrice || !data.selectedPayment || !data.selectedProvince || !data.nameClinic
-                || !data.addressClinic || !data.note) {
+            let checkValidate = checkRequiredFields(data);
+            if (checkValidate.isValid === false) {
                 resolve({
                     errCode: 1,
-                    message: 'Missing required parameters!'
+                    message: `Missing required parameters! ${checkValidate.element}`,
                 })
             }
             else {
@@ -137,6 +108,8 @@ let saveInfoDoctorService = (data) => {
                     doctorInfo.nameClinic = data.nameClinic;
                     doctorInfo.addressClinic = data.addressClinic;
                     doctorInfo.note = data.note;
+                    doctorInfo.specialtyId = data.specialtyId;
+                    // doctorInfo.clinicId = data.clinicId;
                     doctorInfo.updateAt = new Date();
                     await doctorInfo.save();
                 } else {
@@ -149,6 +122,8 @@ let saveInfoDoctorService = (data) => {
                         nameClinic: data.nameClinic,
                         addressClinic: data.addressClinic,
                         note: data.note,
+                        specialtyId: data.specialtyId,
+                        // clinicId: data.clinicId
                     })
                 }
             }
