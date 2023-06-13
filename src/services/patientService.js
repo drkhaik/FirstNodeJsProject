@@ -8,62 +8,124 @@ let buildUrlEmail = (token, doctorId, timeType) => {
     return result;
 }
 
+let checkRequiredFields = (data) => {
+    let arrField = ['fullName', 'email', 'phoneNumber', 'birthday', 'address', 'reason', 'gender', 'doctorId',
+        'timeType', 'language', 'date', 'dateString', 'doctorName', 'addressClinic', 'nameClinic'];
+    let isValid = true, element = '';
+    for (let i = 0; i < arrField.length; i++) {
+        if (!data[arrField[i]]) {
+            isValid = false;
+            element = arrField[i];
+            break;
+        }
+    }
+    return { isValid: isValid, element: element }
+}
+
 let bookAnAppointmentService = (dataAppointment) => {
     return new Promise(async (resolve, reject) => {
         try {
             // console.log("check dataAppointment", dataAppointment);
-            if (!dataAppointment.email || !dataAppointment.doctorId || !dataAppointment.date
-                || !dataAppointment.fullName) {
+            let checkValidate = checkRequiredFields(dataAppointment);
+            if (checkValidate.isValid === false) {
                 resolve({
                     errCode: 1,
-                    message: 'Missing required parameters!'
+                    message: `Missing required parameters! ${checkValidate.element}`,
                 })
             } else {
-                // resolve({
-                //     dataAppointment
-                // })
-
-                // return;
                 let token = uuidv4(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
-
-                await emailService.sendSimpleEmail({
-                    receiverEmail: dataAppointment.email,
-                    patientName: dataAppointment.fullName,
-                    time: dataAppointment.date,
-                    doctorName: dataAppointment.doctorName,
-                    language: dataAppointment.language,
-                    redirectLink: buildUrlEmail(token, dataAppointment.doctorId, dataAppointment.timeType),
-                })
-
+                let address = `${dataAppointment.nameClinic} - ${dataAppointment.addressClinic}`;
 
                 // insert to User table
-                let user = await db.User.findOrCreate({
-                    where: { email: dataAppointment.email },
-                    defaults: {
-                        email: dataAppointment.email,
-                        roleId: 'R3'
-                    },
-                });
-                console.log(">>>>>> drkhaik check info patient", user[0])
-                if (user && user[0]) {
-                    await db.Booking.findOrCreate({
-                        where: { patientId: user[0].id },
-                        defaults: {
+                let patient = await db.Patient.findOne({
+                    where: {
+                        email: dataAppointment.email
+                    }
+                })
+                if (patient) {
+                    // has email in DB // find that email has status in S3 or not, then 
+                    let bookingInfo = await db.Booking.findOne({
+                        where: {
+                            patientId: patient.id,
+                            statusId: ["S1", "S2"],
+                        }
+                    })
+                    if (bookingInfo) {
+                        if (bookingInfo.statusId === 'S1') {
+                            resolve({
+                                errCode: 2,
+                                message: "Oops! Your email currently has one unconfirmed appointment!. Try again later.",
+                            })
+                        }
+                        if (bookingInfo.statusId === 'S2') {
+                            resolve({
+                                errCode: 3,
+                                message: "Oops! Your email currently has another appointment in system.",
+                            })
+                        }
+                    } else {
+                        // send an email
+                        await emailService.sendSimpleEmail({
+                            receiverEmail: dataAppointment.email,
+                            patientName: dataAppointment.fullName,
+                            time: dataAppointment.dateString,
+                            doctorName: dataAppointment.doctorName,
+                            address: address,
+                            language: dataAppointment.language,
+                            redirectLink: buildUrlEmail(token, dataAppointment.doctorId, dataAppointment.timeType),
+                        })
+                        await db.Booking.create({
                             statusId: 'S1',
                             doctorId: dataAppointment.doctorId,
-                            patientId: user[0].id,
+                            patientId: patient.id,
                             date: dataAppointment.date,
+                            dateString: dataAppointment.dateString,
                             timeType: dataAppointment.timeType,
                             token: token
-                        },
+
+                        })
+                        resolve({
+                            errCode: 0,
+                            message: 'Save info booking successful!'
+                        })
+                    }
+
+                } else {
+                    // send an email
+                    await emailService.sendSimpleEmail({
+                        receiverEmail: dataAppointment.email,
+                        patientName: dataAppointment.fullName,
+                        time: dataAppointment.dateString,
+                        doctorName: dataAppointment.doctorName,
+                        address: address,
+                        language: dataAppointment.language,
+                        redirectLink: buildUrlEmail(token, dataAppointment.doctorId, dataAppointment.timeType),
                     })
-                    // console.log("check example", example)
+                    // create new one
+                    await db.Patient.create({
+                        fullName: dataAppointment.fullName,
+                        email: dataAppointment.email,
+                        address: dataAppointment.address ? dataAppointment.address : '',
+                        phoneNumber: dataAppointment.phoneNumber,
+                        gender: dataAppointment.gender,
+                        birthday: dataAppointment.birthday,
+                        reason: dataAppointment.reason,
+                    })
+                    // then create a new booking record
+                    await db.Booking.create({
+                        statusId: 'S1',
+                        doctorId: dataAppointment.doctorId,
+                        patientId: patient.id,
+                        date: dataAppointment.date,
+                        dateString: dataAppointment.dateString,
+                        timeType: dataAppointment.timeType,
+                        token: token
+                    })
+                    resolve({
+                        errCode: 0,
+                        message: 'Save info patient successful!'
+                    })
                 }
-                // create a booking record
-                resolve({
-                    errCode: 0,
-                    message: 'Save info patient successful!'
-                })
             }
         } catch (e) {
             reject(e);

@@ -4,6 +4,7 @@ import userController from "../controllers/userController";
 import doctorController from "../controllers/doctorController";
 import patientController from "../controllers/patientController";
 import specialtyController from "../controllers/specialtyController";
+import clinicController from "../controllers/clinicController";
 
 let router = Express.Router();
 
@@ -34,7 +35,10 @@ let initWebRoutes = (app) => {
     router.post('/api/save-schedule-info', doctorController.saveScheduleInfo);
     router.get('/api/get-schedule-info-by-date', doctorController.getScheduleInfoByDate);
     router.get('/api/get-extra-info-doctor-by-id', doctorController.getExtraInfoDoctorById);
-    router.get(`/api/get-profile-doctor-by-id`, doctorController.getProfileDoctorById)
+    router.get(`/api/get-profile-doctor-by-id`, doctorController.getProfileDoctorById);
+    router.get('/api/get-address-clinic-by-doctorId', doctorController.getAddressClinicByDoctorId);
+    router.get(`/api/get-list-patient-for-doctor`, doctorController.getListPatientForDoctor);
+    router.put(`/api/save-completed-status`, doctorController.saveCompletedStatus);
 
     // ----------- PATIENT ------------ //
     router.post('/api/patient-book-an-appointment', patientController.bookAnAppointment);
@@ -47,6 +51,11 @@ let initWebRoutes = (app) => {
     router.get('/api/delete-specialty-by-id', specialtyController.deleteSpecialtyById);
 
 
+    // ----------- CLINIC ------------ //
+    router.post('/api/create-new-clinic', clinicController.createNewClinic);
+    router.get('/api/get-all-clinic', clinicController.getAllClinic);
+    router.get('/api/get-detail-clinic-by-id', clinicController.getDetailClinicById);
+    router.get('/api/delete-clinic-by-id', clinicController.deleteClinicById);
 
 
     // router.get('/hoidanIT', (req, res) => {

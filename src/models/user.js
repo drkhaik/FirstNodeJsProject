@@ -30,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
     image: DataTypes.STRING,
     roleId: DataTypes.STRING,
     positionId: DataTypes.STRING,
-    day_of_birth: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

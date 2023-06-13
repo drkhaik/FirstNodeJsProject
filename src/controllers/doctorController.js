@@ -2,7 +2,7 @@ import doctorService from "../services/doctorService";
 
 let getOutstandingDoctor = async (req, res) => {
     let limit = req.query.limit;
-    if (!limit) limit = 11;
+    if (!limit) limit = 12;
     try {
         // chuyen tu kieu string sang number
         let response = await doctorService.getOutstandingDoctor(+limit);
@@ -120,6 +120,45 @@ let getProfileDoctorById = async (req, res) => {
     }
 }
 
+let getAddressClinicByDoctorId = async (req, res) => {
+    try {
+        let info = await doctorService.getAddressClinicByDoctorIdService(req.query.doctorId);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
+
+let getListPatientForDoctor = async (req, res) => {
+    try {
+        let info = await doctorService.getListPatientForDoctorService(req.query.doctorId, req.query.date);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
+
+let saveCompletedStatus = async (req, res) => {
+    try {
+        let info = await doctorService.saveCompletedStatusService(req.body);
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
+
 module.exports = {
     getOutstandingDoctor: getOutstandingDoctor,
     getAllDoctor: getAllDoctor,
@@ -130,5 +169,8 @@ module.exports = {
     getScheduleInfoByDate: getScheduleInfoByDate,
     getExtraInfoDoctorById: getExtraInfoDoctorById,
 
-    getProfileDoctorById: getProfileDoctorById
+    getProfileDoctorById: getProfileDoctorById,
+    getAddressClinicByDoctorId: getAddressClinicByDoctorId,
+    getListPatientForDoctor: getListPatientForDoctor,
+    saveCompletedStatus: saveCompletedStatus,
 }

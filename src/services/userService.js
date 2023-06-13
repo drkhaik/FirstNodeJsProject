@@ -12,7 +12,7 @@ let handleUserLogin = (email, password) => {
                 // user already exist
                 let user = await db.User.findOne({
                     where: { email: email },
-                    attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'],
+                    attributes: ['id', 'email', 'roleId', 'password', 'firstName', 'lastName'],
                     raw: true,
                 })
                 if (user) {
@@ -172,7 +172,7 @@ let updateUser = (data) => {
 
                 resolve({
                     errCode: 0,
-                    message: `Update user infomation successful!`
+                    message: `Update user information successful!`
                 });
             } else {
                 resolve({

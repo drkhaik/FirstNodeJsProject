@@ -17,7 +17,12 @@ let sendSimpleEmail = async (dataSend) => {
         from: '"Drkhaik 👻" <trinhkhai.dev@example.com>', // sender address
         to: dataSend.receiverEmail, // list of receivers
         subject: dataSend && dataSend.language === 'vi' ? "Thông tin đặt lịch khám bệnh" : "Appointment information!", // Subject line
-        html: getBodyHtmlEmail(dataSend)
+        html: getBodyHtmlEmail(dataSend),
+        // attachments: [{
+        //     filename: `prescription-${dataSend.patientId}-${new Date().getTime()}.png`,
+        //     content: dataSend.imgBase64.split("base64,")[1],
+        //     encoding: 'base64'
+        // }]
     });
 
 }
@@ -30,8 +35,9 @@ let getBodyHtmlEmail = (dataSend) => {
         <p>Cảm ơn Anh/ Chị đã đặt lịch khám bệnh trên BookingCarePlus!
         Nhân sự thuộc bộ phận chăm sóc khách hàng sẽ liên lạc với anh/ chị vào thời gian sớm nhất theo số điện thoại liên lạc anh/ chị đã cung cấp.</p>
         <p>Thông tin đã đặt trong lịch khám bệnh của người bệnh như sau: </p>
-        <div> <b>Thời gian: ${dataSend.time}     </b></div>
-        <div> <b> Bác sĩ khám: ${dataSend.doctorName} </b></div>
+        <div>Thời gian: <b> ${dataSend.time}     </b></div>
+        <div>Địa điểm: <b> ${dataSend.address}     </b></div>
+        <div>Bác sĩ khám: <b> ${dataSend.doctorName} </b></div>
         <br></br>
         <p> Vui lòng ấn vào đường link bên dưới để xác nhận và hoàn tất thủ tục đặt lịch khám bệnh!</p>
         <a href=${dataSend.redirectLink} target="_blank" >Xác nhận đặt lịch!</a>
@@ -45,8 +51,9 @@ let getBodyHtmlEmail = (dataSend) => {
         <p>Thank you for booking an appointment on BookingCarePlus! 
         Customer service personnel will contact you as soon as possible according to the contact number you have provided.</p>
         <p>The information filled in the medical examination schedule is as follows: </p>
-        <div> <b>Time: ${dataSend.time} </b></div>
-        <div> <b> Doctor: ${dataSend.doctorName} </b></div>
+        <div>Time: <b> ${dataSend.time} </b></div>
+        <div>Address: <b> ${dataSend.address} </b></div>
+        <div>Doctor: <b> ${dataSend.doctorName} </b></div>
         <br></br>
         <p> Please click on the link below to confirm and complete the booking process!</p>
         <div>
