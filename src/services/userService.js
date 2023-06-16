@@ -1,7 +1,28 @@
 import db from "../models/index";;
 import bcrypt from 'bcryptjs';
+import { createJWT } from '../middleware/JWTaction';
+import jwt from "jsonwebtoken";
+require("dotenv").config();
 
 const salt = bcrypt.genSaltSync(10);
+
+let generateAccessToken = (user) => {
+    return jwt.sign({
+        // id: user.id,
+        role: user.roleId
+    }, process.env.JWT_ACCESS_KEY,
+        { expiresIn: "1d" }
+    )
+}
+
+let generateRefreshToken = (user) => {
+    return jwt.sign({
+        // id: user.id,
+        role: user.roleId
+    }, process.env.JWT_REFRESH_KEY,
+        { expiresIn: "30d" }
+    )
+}
 
 let handleUserLogin = (email, password) => {
     return new Promise(async (resolve, reject) => {
@@ -21,6 +42,9 @@ let handleUserLogin = (email, password) => {
                     if (checkPassword) {
                         userData.errCode = 0;
                         userData.message = "Ok";
+                        // userData.jwtKey = createJWT(); // then save in redux, verify
+                        userData.accessToken = generateAccessToken(user)
+                        userData.refreshToken = generateRefreshToken(user)
                         // delete password ko day ra phia client
                         delete user.password;
                         userData.user = user;
@@ -68,7 +92,7 @@ let getUsers = (userId) => {
             if (userId === 'ALL') {
                 users = await db.User.findAll({
                     // except password
-                    attributes: { exclude: ["password"] },
+                    attributes: { exclude: ["password", "image"] },
                     limit: 10,
                     order: [
                         ['createdAt', 'DESC']
@@ -98,7 +122,7 @@ let createUser = (data) => {
             if (checkEmailExist === true) {
                 resolve({
                     errCode: 1,
-                    message: "Your email is already in use! Try another please!",
+                    message: "Your email is already in use! Try another!",
                 })
             } else {
                 let hashPasswordFromBcrypt = await hashUserPassword(data.password);
@@ -191,13 +215,15 @@ let deleteUser = (userId) => {
         try {
             let user = await db.User.findByPk(userId);
             if (user) {
-                await db.User.destroy({
+                // await db.User.destroy({
+                await db.User.findOne({
                     where: { id: userId }
                 });
                 // let allUsers = getAllUser();  
                 resolve({
                     errCode: 0,
-                    message: `The user is deleted!`
+                    message: `The user is deleted!`,
+                    user
                 })
             } else {
                 resolve({
