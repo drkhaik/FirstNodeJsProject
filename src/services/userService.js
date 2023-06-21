@@ -1,6 +1,6 @@
 import db from "../models/index";;
 import bcrypt from 'bcryptjs';
-import { createJWT } from '../middleware/JWTaction';
+// import { createJWT } from '../middleware/JWTaction';
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 
@@ -215,8 +215,8 @@ let deleteUser = (userId) => {
         try {
             let user = await db.User.findByPk(userId);
             if (user) {
-                // await db.User.destroy({
-                await db.User.findOne({
+                await db.User.destroy({
+                    // await db.User.findOne({
                     where: { id: userId }
                 });
                 // let allUsers = getAllUser();  

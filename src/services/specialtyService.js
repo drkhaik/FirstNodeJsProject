@@ -89,6 +89,26 @@ let getAllSpecialtyServices = () => {
     })
 }
 
+let getAllSpecialtyNameService = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // console.log("check dataAppointment", dataAppointment);
+
+            let data = await db.Specialty.findAll(
+                { attributes: ['id', 'name'] },
+            );
+            resolve({
+                errCode: 0,
+                message: 'Ok',
+                data
+            })
+
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
 let getDetailSpecialtyByIdService = (specialtyId, location) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -145,4 +165,5 @@ module.exports = {
     getAllSpecialtyServices: getAllSpecialtyServices,
     getDetailSpecialtyByIdService: getDetailSpecialtyByIdService,
     deleteSpecialtyService: deleteSpecialtyService,
+    getAllSpecialtyNameService: getAllSpecialtyNameService
 }

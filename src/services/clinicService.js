@@ -142,10 +142,30 @@ let getDetailClinicByIdService = (clinicId) => {
     })
 }
 
+let getAllClinicNameService = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // console.log("check dataAppointment", dataAppointment);
+
+            let data = await db.Clinic.findAll(
+                { attributes: ['id', 'name'] },
+            );
+            resolve({
+                errCode: 0,
+                message: 'Ok',
+                data
+            })
+
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
 
 module.exports = {
     createNewClinicService: createNewClinicService,
     getAllClinicService: getAllClinicService,
     getDetailClinicByIdService: getDetailClinicByIdService,
     deleteClinicService: deleteClinicService,
+    getAllClinicNameService: getAllClinicNameService,
 }

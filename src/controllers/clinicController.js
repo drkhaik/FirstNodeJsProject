@@ -52,11 +52,23 @@ let deleteClinicById = async (req, res) => {
     }
 }
 
-
+let getAllClinicName = async (req, res) => {
+    try {
+        let info = await clinicService.getAllClinicNameService();
+        return res.status(200).json(info);
+    } catch (e) {
+        console.log(e)
+        return res.status(200).json({
+            errCode: -1,
+            message: "Error from server..."
+        })
+    }
+}
 
 module.exports = {
     createNewClinic: createNewClinic,
     getAllClinic: getAllClinic,
     getDetailClinicById: getDetailClinicById,
     deleteClinicById: deleteClinicById,
+    getAllClinicName: getAllClinicName,
 }

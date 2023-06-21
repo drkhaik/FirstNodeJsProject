@@ -5,6 +5,7 @@ import doctorController from "../controllers/doctorController";
 import patientController from "../controllers/patientController";
 import specialtyController from "../controllers/specialtyController";
 import clinicController from "../controllers/clinicController";
+import handbookController from "../controllers/handbookController";
 
 let router = Express.Router();
 
@@ -49,14 +50,21 @@ let initWebRoutes = (app) => {
     router.get('/api/get-all-specialty', specialtyController.getAllSpecialty);
     router.get('/api/get-detail-specialty-by-id', specialtyController.getDetailSpecialtyById);
     router.get('/api/delete-specialty-by-id', specialtyController.deleteSpecialtyById);
-
+    router.get('/api/get-all-specialty-name', specialtyController.getAllSpecialtyName);
 
     // ----------- CLINIC ------------ //
     router.post('/api/create-new-clinic', clinicController.createNewClinic);
     router.get('/api/get-all-clinic', clinicController.getAllClinic);
     router.get('/api/get-detail-clinic-by-id', clinicController.getDetailClinicById);
     router.get('/api/delete-clinic-by-id', clinicController.deleteClinicById);
+    router.get('/api/get-all-clinic-name', clinicController.getAllClinicName);
 
+
+    // ----------- HANDBOOK ------------ //
+    router.post('/api/create-new-handbook', handbookController.createNewHandbook);
+    router.get('/api/get-all-handbook', handbookController.getAllHandbook);
+    router.get('/api/get-detail-handbook-by-id', handbookController.getDetailHandbookById);
+    router.get('/api/delete-handbook-by-id', handbookController.deleteHandbookById);
 
     // router.get('/hoidanIT', (req, res) => {
     //     return res.send("Hoi dan IT tai day");
